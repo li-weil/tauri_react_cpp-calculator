@@ -35,7 +35,7 @@ function App() {
       setResult(calcResult as number);
     } catch (err) {
       console.error("Error calculating expression:", err);
-      setError("Error calculating expression. Please check your input.");
+      setError(err + " Please check your input.");
       setResult(null);
     }
   }

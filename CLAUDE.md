@@ -2,73 +2,100 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Architecture
+## Project Overview
 
-This is a Tauri desktop application that combines multiple technologies:
+This is a Tauri desktop application that implements a mathematical expression calculator using C++ stack-based algorithms. The project combines multiple technologies to create a cross-platform desktop application with native C++ performance.
 
 - **Frontend**: React 19 + TypeScript with Vite as the build tool
-- **Backend**: Rust with Tauri framework
-- **Native Integration**: C++ code compiled and linked via Rust's FFI (Foreign Function Interface)
+- **Backend**: Rust with Tauri framework serving as FFI bridge
+- **Native Integration**: C++ stack-based expression calculator compiled and linked via Rust's FFI
 
-### Key Architecture Components
+## Architecture Overview
 
-1. **Frontend (src/)**: React application that communicates with the backend via Tauri's `invoke()` API
-2. **Rust Backend (src-tauri/src/)**: Tauri application that serves as a bridge between frontend and C++ code
-3. **C++ Integration (src-tauri/cpp/)**: Native C++ functions compiled as static library and called from Rust
-4. **Build System**:
-   - `build.rs` compiles C++ code using `cc` crate
-   - Vite handles frontend development server
-   - Tauri handles the overall application build and packaging
+The application follows a three-tier architecture:
+
+1. **Frontend (src/)**: React calculator interface that sends expressions to backend via Tauri's `invoke()` API
+2. **Rust FFI Layer (src-tauri/src/lib.rs)**: Safe Rust wrappers around C++ functions, exposed as Tauri commands
+3. **C++ Calculator Engine (src-tauri/cpp/)**: Native stack-based expression evaluation with thread-safe global stacks
+
+### Key Components
+
+- **Stack Template** (`src-tauri/cpp/stack.hpp`): Generic stack implementation with dynamic resizing
+- **Expression Calculator** (`src-tauri/cpp/hello.cpp`): Stack-based algorithm evaluating mathematical expressions with operator precedence
+- **Tauri Commands**: `init_stack_command()` and `calculate_expression()` exposed to frontend
+- **Thread Safety**: Global stacks protected by `std::mutex` for safe concurrent access
 
 ## Development Commands
 
-### Frontend Development
-```bash
-# Start development server (frontend + Tauri)
-pnpm tauri dev
-
-# Frontend only (if needed)
-pnpm dev
-```
-
-### Building
-```bash
-# Build frontend
-pnpm build
-
-# Build complete Tauri application
-pnpm tauri build
-```
-
-### Package Management
 ```bash
 # Install dependencies
 pnpm install
 
-# Tauri CLI commands
+# Start full development server (frontend + Tauri + C++ compilation)
+pnpm tauri dev
+
+# Frontend development only (for UI changes)
+pnpm dev
+
+# Build frontend TypeScript
+pnpm build
+
+# Build complete Tauri application with C++ integration
+pnpm tauri build
+
+# Other Tauri commands
 pnpm tauri [command]
 ```
 
-## C++ Integration Workflow
+## C++ Integration Architecture
 
-The project uses a specific pattern for C++ integration:
+The project uses a specific C++ FFI integration pattern:
 
-1. **C++ Functions**: Defined in `src-tauri/cpp/hello.cpp` with `extern "C"` linkage
-2. **Build Process**: `build.rs` compiles C++ to static library using `cc::Build`
-3. **Rust FFI Wrapper**: `src-tauri/src/lib.rs` declares external C++ functions and creates safe Rust wrappers
-4. **Tauri Commands**: Rust wrappers exposed as Tauri commands for frontend consumption
-5. **Frontend Calls**: React components use `invoke()` to call backend commands
+### Build System (`src-tauri/build.rs`)
+- Compiles C++ code using `cc` crate into static library `hello_cpp`
+- Automatically rebuilds when C++ files change via `cargo:rerun-if-changed`
+- Handles C++ compilation flags and include paths
 
-When modifying C++ code:
-- Edit functions in `src-tauri/cpp/hello.cpp`
-- The build system automatically detects changes and recompiles
-- Add new function declarations in `src-tauri/src/lib.rs` with `extern "C"`
-- Create safe Rust wrappers and expose as Tauri commands
+### C++ Layer (`src-tauri/cpp/`)
+- **Functions**: Exported with `extern "C"` linkage for FFI compatibility
+- **Thread Safety**: Global stacks protected by `std::mutex`
+- **Error Handling**: Returns integer error codes mapped to Rust Result types
+- **Memory Management**: Uses smart pointers and RAII for safety
 
-## Project Structure Notes
+### Rust FFI Bridge (`src-tauri/src/lib.rs`)
+- **Declarations**: `extern "C"` blocks declaring C++ function signatures
+- **Safe Wrappers**: Convert unsafe C++ calls to safe Rust Result types
+- **Error Mapping**: Maps C++ error codes to descriptive Rust error messages
+- **Tauri Commands**: Exposes safe wrappers as `#[tauri::command]` functions
 
-- Frontend runs on `http://localhost:1420` during development
-- Tauri window configured to 800x600 pixels
-- C++ compiled to static library named `hello_cpp`
-- All C++ strings use `static std::string` to ensure memory safety across FFI boundaries
-- Project uses `pnpm` as package manager (configured in tauri.conf.json)
+### Frontend Integration (`src/App.tsx`)
+- **Initialization**: Calls `init_stack_command` on app startup
+- **Expression Evaluation**: Uses `calculate_expression` command for user input
+- **Error Handling**: Displays backend error messages to users
+
+## Expression Calculator Algorithm
+
+The C++ calculator uses two-stack algorithm:
+1. **Number Stack**: Stores integer operands
+2. **Operator Stack**: Stores operators with precedence handling
+3. **Algorithm**: Processes infix expressions with proper operator precedence and parentheses
+4. **Supported Operations**: +, -, *, / with proper precedence and parentheses handling
+
+## Error Codes
+
+C++ backend returns specific error codes:
+- `0`: Success
+- `-1`: Stack not initialized
+- `-2`: Empty input
+- `-3`: Division by zero
+- `-4`: Unknown operator
+- `-5`: Invalid expression (insufficient numbers)
+- `-6`: No result available
+
+## Project Configuration
+
+- **Development Server**: `http://localhost:1420`
+- **Window Size**: 800x600 pixels (configurable in `tauri.conf.json`)
+- **Package Manager**: pnpm (configured in tauri.conf.json)
+- **C++ Standard**: Modern C++ with template metaprogramming
+- **Thread Safety**: Mutex-protected global state

@@ -1,6 +1,5 @@
 #include "stack.hpp"
 #include <string>
-#include <vector>
 #include <memory>
 #include <mutex>
 #include <cstring>
@@ -14,19 +13,15 @@ static std::unique_ptr<Stack<char>> stack_sym;
 // C 接口,可以使用c++特性，但是接口必须是C风格的
 namespace{
     int priority_judge(char a,char b){
-        if(a=='+'&&b=='-'||a=='-'&&b=='+'||a=='*'&&b=='/'||a=='/'&&b=='*'||a=='*'&&b=='+'
-        ||a=='+'&&b=='+'||a=='-'&&b=='-'||a=='*'&&b=='*'||a=='/'&&b=='/'
-            ||a=='*'&&b=='-'||a=='/'&&b=='+'||a=='/'&&b=='-'
-            ||a=='-'&&b==')'||a=='+'&&b==')'||a=='*'&&b==')'||a=='/'&&b==')'||a=='('&&b==')')return 1;
+        if(a=='+'&&b=='-'||a=='-'&&b=='+'||a=='+'&&b=='+'||a=='-'&&b=='-'
+            ||a=='*'&&b=='/'||a=='/'&&b=='*'||a=='*'&&b=='*'||a=='/'&&b=='/'
+            ||a=='*'&&b=='+'||a=='*'&&b=='-'||a=='/'&&b=='+'||a=='/'&&b=='-'
+            ||a=='^'&&b=='+'||a=='^'&&b=='-'||a=='^'&&b=='*'||a=='^'&&b=='/'||a=='^'&&b=='^'
+            ||a=='-'&&b==')'||a=='+'&&b==')'||a=='*'&&b==')'||a=='/'&&b==')'||a=='('&&b==')'||a=='^'&&b==')')
+                return 1;
         return 0;
     }    
-    int convert_char_to_num(const char* a,int len){
-        int num=0;
-        for(int i=0;i<len;i++){
-            num=num*10+(a[i]-'0');
-        }
-        return num;
-    }
+
 }
 
 extern "C" {
@@ -53,29 +48,34 @@ extern "C" {
         if (!input) {
             return -2;  // 输入为空
         }
-
-        int len=strlen(input);
+        std::string s = input;
+        s.erase( std::remove_if( s.begin(), s.end(), ::isspace ), s.end() ); //去除空格
+        int len=s.length();
         int result=0;
 
         // 清空栈，为新的计算做准备
         stack_num->clear();
         stack_sym->clear();
-        if(input[0]=='-'){   //处理单目减法
+        if(s[0]=='-'){   //处理单目减法
             stack_sym->push('0');
         }
         for(int i=0;i<len;i++){
-            if(input[i]>='0'&&input[i]<='9'){
+            if(s[i]>='0'&&s[i]<='9'){
                 int j=i;
-                while(j<len&&(input[j]>='0'&&input[j]<='9'))j++;
-                stack_num->push(convert_char_to_num(input+i,j-i));
+                while(j<len&&(s[j]>='0'&&s[j]<='9'))j++;
+                stack_num->push(std::stoi(s.substr(i,j-i)));
                 i=j-1;
                 continue;
             }
-            
-            while(stack_sym->size()&&priority_judge(stack_sym->top(),input[i])){
+            int match=0;
+            while(stack_sym->size()&&priority_judge(stack_sym->top(),s[i])){
                 if(stack_sym->top()=='('){
                     stack_sym->pop();
+                    match=1;
                     break;
+                }
+                if(stack_num->size()<2){
+                    return -5;  // 表达式错误，数字不足
                 }
                 int a=stack_num->pop(),b=stack_num->pop();
                 // 计算结果，注意除零检查
@@ -90,14 +90,18 @@ extern "C" {
                         }
                         calc_result = b / a;
                         break;
+                    case '^':
+                        calc_result = 1;
+                        for(int k=0;k<a;k++)calc_result*=b;
+                        break;
                     default:
                         return -4;  // 未知运算符
                 }
                 stack_num->push(calc_result);
                 stack_sym->pop();
             }
-            if(input[i]!=')')stack_sym->push(input[i]);
-        
+            if(s[i]!=')')stack_sym->push(s[i]);
+            else if(!match)return -5;
         }
         // 完成剩余计算
         while(!stack_sym->empty()){
@@ -117,6 +121,10 @@ extern "C" {
                         return -3;  // 除零错误
                     }
                     calc_result = b / a;
+                    break;
+                case '^':    //注意别忘了break
+                    calc_result = 1;
+                    for(int k=0;k<a;k++)calc_result*=b;
                     break;
                 default:
                     return -4;  // 未知运算符
