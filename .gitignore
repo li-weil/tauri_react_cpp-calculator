@@ -7,10 +7,34 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Node.js
 node_modules
 dist
 dist-ssr
 *.local
+
+# Tauri specific
+src-tauri/target/
+src-tauri/Cargo.lock
+
+# Rust/C++ specific
+*.pdb
+*.ilk
+*.exe
+*.dll
+*.lib
+*.obj
+*.o
+*.so
+*.dylib
+
+# Build artifacts
+build/
+Debug/
+Release/
+x64/
+DebugARM64/
+ReleaseARM64/
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +46,46 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Package manager files
+package-lock.json
+yarn.lock
+
+# C++ specific
+*.cache
+*.tlog
+*.cache
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp_proj
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# CMake
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+Makefile
+*.cmake
+
+# Backup files
+*.bak
+*.backup
+*.tmp
+*.temp
