@@ -235,7 +235,7 @@ function App() {
       setPolyError("");
       const result = await invoke("get_polynomial_with_latex_command", { name });
       const output = result as { standard: string; latex: string };
-      return output.standard; // Return standard format for simple display
+      return output.standard; 
     } catch (err) {
       console.error("Error getting polynomial:", err);
       setPolyError(err as string);
@@ -439,7 +439,8 @@ async function getPolynomialWithLatex(name: string) {
           <div style={{ marginBottom: "30px", padding: "20px", backgroundColor: "#e9ecef", borderRadius: "8px" }}>
             <h3 style={{ margin: "0 0 15px 0" }}>构建多项式</h3>
             <p style={{ marginBottom: "15px", color: "#6c757d", fontSize: "14px" }}>
-              输入格式: 系数1,指数1,系数2,指数2,... (例如: 3,2,2,1,1,0 表示 3x²+2x+1)
+              输入格式: 系数1,指数1,系数2,指数2,... (例如: 3,2,2,1,1,0 表示 3x²+2x+1)<br />
+              无需项数n，无需保证指数递减排列
             </p>
 
             <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "15px" }}>

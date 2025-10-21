@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "cpptest",
+  "productName": "cpp_calculator",
   "version": "0.1.0",
-  "identifier": "com.admin.cpptest",
+  "identifier": "com.admin.cpp_calculator",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "cpptest",
+        "title": "cpp_calculator",
         "width": 800,
         "height": 600
       }

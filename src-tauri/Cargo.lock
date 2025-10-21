@@ -532,7 +532,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cpptest"
+name = "cpp_calculator"
 version = "0.1.0"
 dependencies = [
  "cc",

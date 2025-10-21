@@ -130,11 +130,9 @@ fn get_animation_operations() -> Result<Vec<StackOperation>, String> {
     }
 }
 
-// ============================================================================
-// 多项式功能的安全包装器
-// ============================================================================
 
-/// 安全地创建多项式
+
+// 安全地创建多项式
 fn create_polynomial_safe(name: char, input: &str) -> Result<String, String> {
     unsafe {
         let c_input = CString::new(input).map_err(|_| "Invalid input")?;
@@ -150,7 +148,7 @@ fn create_polynomial_safe(name: char, input: &str) -> Result<String, String> {
     }
 }
 
-/// 安全地获取多项式字符串
+// 安全地获取多项式字符串
 fn get_polynomial_string_safe(name: char) -> Result<String, String> {
     unsafe {
         let buffer_size = 1024;
@@ -173,7 +171,7 @@ fn get_polynomial_string_safe(name: char) -> Result<String, String> {
     }
 }
 
-/// 安全地计算多项式表达式
+// 安全地计算多项式表达式
 fn calculate_polynomials_safe(expression: &str) -> Result<String, String> {
     unsafe {
         let c_expr = CString::new(expression).map_err(|_| "Invalid expression")?;
@@ -203,8 +201,7 @@ fn calculate_polynomials_safe(expression: &str) -> Result<String, String> {
         }
     }
 }
-
-/// 安全地计算多项式在x处的值
+// 安全地计算多项式在x处的值
 fn evaluate_polynomial_safe(name: char, x: i32) -> Result<i32, String> {
     unsafe {
         let mut result = 0;
@@ -219,7 +216,7 @@ fn evaluate_polynomial_safe(name: char, x: i32) -> Result<i32, String> {
     }
 }
 
-/// 安全地求多项式的导函数
+// 安全地求多项式的导函数
 fn derivative_polynomial_safe(name: char) -> Result<String, String> {
     unsafe {
         let buffer_size = 1024;
@@ -242,7 +239,7 @@ fn derivative_polynomial_safe(name: char) -> Result<String, String> {
     }
 }
 
-/// 安全地清空所有多项式
+// 安全地清空所有多项式
 fn clear_all_polynomials_safe() -> Result<String, String> {
     unsafe {
         let result = clear_all_polynomials();
@@ -253,7 +250,7 @@ fn clear_all_polynomials_safe() -> Result<String, String> {
     }
 }
 
-/// 安全地获取多项式名称列表
+// 安全地获取多项式名称列表
 fn get_polynomial_names_safe() -> Result<Vec<char>, String> {
     unsafe {
         let max_count = 5 as i32;
@@ -269,7 +266,7 @@ fn get_polynomial_names_safe() -> Result<Vec<char>, String> {
     }
 }
 
-/// 安全地检查多项式是否存在
+// 安全地检查多项式是否存在
 fn polynomial_exists_safe(name: char) -> Result<bool, String> {
     unsafe {
         let result = polynomial_exists(name as std::os::raw::c_char);
@@ -281,7 +278,7 @@ fn polynomial_exists_safe(name: char) -> Result<bool, String> {
     }
 }
 
-/// 安全地获取多项式项数
+// 安全地获取多项式项数
 fn get_polynomial_term_count_safe(name: char) -> Result<i32, String> {
     unsafe {
         let mut count = 0;
@@ -296,7 +293,7 @@ fn get_polynomial_term_count_safe(name: char) -> Result<i32, String> {
     }
 }
 
-/// 安全地获取多项式字符串（包含LaTeX格式）
+// 安全地获取多项式字符串（包含LaTeX格式）
 fn get_polynomial_string_with_latex_safe(name: char) -> Result<(String, String), String> {
     unsafe {
         let buffer_size = 2048;
@@ -329,7 +326,7 @@ fn get_polynomial_string_with_latex_safe(name: char) -> Result<(String, String),
     }
 }
 
-/// 安全地计算多项式表达式（包含LaTeX格式）
+// 安全地计算多项式表达式（包含LaTeX格式）
 fn calculate_polynomials_with_latex_safe(expression: &str) -> Result<(String, String), String> {
     unsafe {
         let c_expr = CString::new(expression).map_err(|_| "Invalid expression")?;
@@ -346,13 +343,12 @@ fn calculate_polynomials_with_latex_safe(expression: &str) -> Result<(String, St
                 let c_str = CStr::from_ptr(buffer.as_ptr() as *const std::os::raw::c_char);
                 let combined = c_str.to_string_lossy().to_string();
 
-                // Split by "|" to separate standard and LaTeX formats
+                //  "|" 分割 standard and LaTeX formats
                 if let Some(pipe_pos) = combined.find('|') {
                     let standard = combined[..pipe_pos].to_string();
                     let latex = combined[pipe_pos + 1..].to_string();
                     Ok((standard, latex))
                 } else {
-                    // Fallback: treat as standard format only
                     Ok((combined.clone(), combined))
                 }
             },
@@ -386,13 +382,12 @@ fn derivative_polynomial_with_latex_safe(name: char) -> Result<(String, String),
                 let c_str = CStr::from_ptr(buffer.as_ptr() as *const std::os::raw::c_char);
                 let combined = c_str.to_string_lossy().to_string();
 
-                // Split by "|" to separate standard and LaTeX formats
+                //  "|" 分割 standard and LaTeX formats
                 if let Some(pipe_pos) = combined.find('|') {
                     let standard = combined[..pipe_pos].to_string();
                     let latex = combined[pipe_pos + 1..].to_string();
                     Ok((standard, latex))
                 } else {
-                    // Fallback: treat as standard format only
                     Ok((combined.clone(), combined))
                 }
             },

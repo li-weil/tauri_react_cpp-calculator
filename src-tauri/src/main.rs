@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    cpptest_lib::run()
+    cpp_calculator_lib::run()
 }

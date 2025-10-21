@@ -6,6 +6,7 @@ fn main() {
         .file("cpp/calc_polynomial.cpp") // 多项式计算源文件
         .file("cpp/polynomial.cpp") // 多项式类实现源文件
         .include("cpp") // 包含目录
+        .flag("/utf-8") // 支持 UTF-8 编码，注释使用中文
         .compile("hello_cpp" ); // 编译为静态库
 
     // 重新编译条件

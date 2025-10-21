@@ -11,9 +11,7 @@
 
 using namespace std;
 
-// ============================================================================
-// 常量定义
-// ============================================================================
+
 static constexpr int MAX_OPERATIONS = 10000;
 static constexpr char OPERATION_PUSH = 1;
 static constexpr char OPERATION_POP = 0;
@@ -28,9 +26,7 @@ static constexpr int ERROR_INVALID_EXPRESSION = -5;
 static constexpr int ERROR_NO_RESULT = -6;
 static constexpr int ERROR_PARENTHESIS_MISMATCH = -7;
 
-// ============================================================================
-// 全局状态变量
-// ============================================================================
+
 static mutex stack_mutex;                                                      // 线程安全互斥锁
 static unique_ptr<Stack<int>> stack_num;                                       // 数字栈
 static unique_ptr<Stack<char>> stack_sym;                                      // 符号栈
@@ -42,7 +38,7 @@ static int abs_cnt = 0;                                                        /
 static int time_stamp = 0;                                                      // 全局时间戳
 
 // ============================================================================
-// 辅助函数声明
+// 辅助函数声明和实现
 // ============================================================================
 static bool should_operator_execute(char stack_top, char current_input);
 static pair<int, string> perform_calculation(char operation, int operand_a, int operand_b);
@@ -52,9 +48,7 @@ static void reset_calculation_state();
 static bool is_digit(char c);
 static int parse_number(const string& s, int start_pos, int& end_pos);
 
-// ============================================================================
-// 辅助函数实现
-// ============================================================================
+
 
 /**
  * @brief 判断是否应该执行栈顶操作符

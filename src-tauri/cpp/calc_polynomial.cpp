@@ -1,6 +1,4 @@
 #include "polynomial.hpp"
-#include "polynomial.cpp"
-// Polynomial Calculator - C Interface Implementation
 #include <cstring>
 #include <iostream>
 #include <memory>
@@ -25,49 +23,24 @@ static constexpr int ERROR_PARENTHESES_MISMATCH = -8;
 static constexpr int ERROR_INVALID_CHARACTER = -9;
 
 // ============================================================================
-// Helper Functions
+// 辅助函数实现
 // ============================================================================
-static string copy_string_to_c_str(const string& str);
 static bool is_valid_polynomial_name(char name);
 static bool is_valid_operator(char op);
 static int get_operator_precedence(char op);
 
-// ============================================================================
-// Helper Function Implementation
-// ============================================================================
 
-/**
- * @brief Safely copy string to C-style string buffer
- * @param str input string
- * @return copied string
- */
-static string copy_string_to_c_str(const string& str) {
-    return str;
-}
-
-/**
- * @brief Check if polynomial name is valid
- * @param name polynomial name
- * @return true: valid, false: invalid
- */
+// 检查多项式名称是否合法
 static bool is_valid_polynomial_name(char name) {
     return name >= 'a' && name <= 'e';
 }
 
-/**
- * @brief Check if operator is valid
- * @param op operator
- * @return true: valid, false: invalid
- */
+// 检查运算符是否合法
 static bool is_valid_operator(char op) {
     return op == '+' || op == '-' || op == '*' || op == '(' || op == ')';
 }
 
-/**
- * @brief Get operator precedence
- * @param op operator
- * @return precedence level (higher number = higher precedence)
- */
+// 获取运算符优先级
 static int get_operator_precedence(char op) {
     switch (op) {
         case '*':
@@ -84,15 +57,15 @@ static int get_operator_precedence(char op) {
 }
 
 // ============================================================================
-// C Interface Functions
+// C 接口实现
 // ============================================================================
 
 extern "C" {
 
 /**
- * @brief Create polynomial
- * @param name polynomial name ('a'-'e')
- * @param input input string format: "c1,e1,c2,e2,..."
+ * @brief 多项式构建
+ * @param name 多项式名称 ('a'-'e')
+ * @param input 用户输入 format: "c1,e1,c2,e2,..."
  * @return 0: success, other: error code
  */
 int create_polynomial(char name, const char* input) {
@@ -109,10 +82,10 @@ int create_polynomial(char name, const char* input) {
 }
 
 /**
- * @brief Get polynomial string representation
- * @param name polynomial name
- * @param output output buffer
- * @param buffer_size buffer size
+ * @brief 得到标准输出字符串
+ * @param name 多项式名称
+ * @param output 指针输出
+ * @param buffer_size  缓冲区大小
  * @return 0: success, other: error code
  */
 int get_polynomial_to_string(char name, char* output, int buffer_size) {
@@ -128,7 +101,6 @@ int get_polynomial_to_string(char name, char* output, int buffer_size) {
     int ret = PolynomialManager::get_polynomial_string(name, result);
 
     if (ret == ERROR_SUCCESS) {
-        // Check buffer size
         if (result.length() >= static_cast<size_t>(buffer_size)) {
             return ERROR_INVALID_INPUT;
         }
@@ -139,10 +111,10 @@ int get_polynomial_to_string(char name, char* output, int buffer_size) {
 }
 
 /**
- * @brief Calculate polynomial expression
- * @param expression polynomial expression (e.g. "a+b", "a-b*c")
- * @param output output buffer
- * @param buffer_size buffer size
+ * @brief 用户输入多项式算数表达式计算
+ * @param expression 多项式表达式(e.g. "a+b", "a-b*c")
+ * @param output 指针输出
+ * @param buffer_size 缓冲区大小
  * @return 0: success, other: error code
  */
 int calculate_polynomials(const char* expression, char* output, int buffer_size) {
@@ -156,14 +128,14 @@ int calculate_polynomials(const char* expression, char* output, int buffer_size)
 
     string expr_str(expression);
 
-    // Remove spaces from expression
+    // 去除空格
     expr_str.erase(remove_if(expr_str.begin(), expr_str.end(), ::isspace), expr_str.end());
 
     if (expr_str.empty()) {
         return ERROR_EMPTY_EXPRESSION;
     }
 
-    // Validate expression characters
+    // 非法字符判断
     for (char c : expr_str) {
         if (!is_valid_polynomial_name(c) && !is_valid_operator(c)) {
             return ERROR_INVALID_CHARACTER;
@@ -174,7 +146,6 @@ int calculate_polynomials(const char* expression, char* output, int buffer_size)
     int ret = PolynomialManager::calculate_polynomials(expr_str, result);
 
     if (ret == ERROR_SUCCESS) {
-        // Check buffer size
         if (result.length() >= static_cast<size_t>(buffer_size)) {
             return ERROR_INVALID_INPUT;
         }
@@ -185,10 +156,10 @@ int calculate_polynomials(const char* expression, char* output, int buffer_size)
 }
 
 /**
- * @brief Calculate polynomial value at x
- * @param name polynomial name
- * @param x input value
- * @param result output result
+ * @brief 计算多项式在x值
+ * @param name 多项式名称
+ * @param x 
+ * @param result 指针输出
  * @return 0: success, other: error code
  */
 int evaluate_polynomial(char name, int x, int* result) {
@@ -204,10 +175,10 @@ int evaluate_polynomial(char name, int x, int* result) {
 }
 
 /**
- * @brief Calculate polynomial derivative
- * @param name polynomial name
- * @param output output buffer
- * @param buffer_size buffer size
+ * @brief 计算多项式导数
+ * @param name 多项式名称
+ * @param output 指针输出
+ * @param buffer_size 缓冲区大小
  * @return 0: success, other: error code
  */
 int derivative_polynomial(char name, char* output, int buffer_size) {
@@ -233,20 +204,17 @@ int derivative_polynomial(char name, char* output, int buffer_size) {
     return ret;
 }
 
-/**
- * @brief Clear all polynomials
- * @return 0: success
- */
+
 int clear_all_polynomials() {
     PolynomialManager::clear_all();
     return ERROR_SUCCESS;
 }
 
 /**
- * @brief Get all created polynomial name list
- * @param names name buffer
- * @param max_count maximum name count
- * @return actual name count
+ * @brief 获取多项式名称
+ * @param names 指针输出
+ * @param max_count 
+ * @return 多项式数量
  */
 int get_polynomial_names(char* names, int max_count) {
     if (!names || max_count <= 0) {
@@ -267,11 +235,6 @@ int get_polynomial_names(char* names, int max_count) {
     return count;
 }
 
-/**
- * @brief Check if polynomial exists
- * @param name polynomial name
- * @return 1: exists, 0: not exists, other: error code
- */
 int polynomial_exists(char name) {
     if (!is_valid_polynomial_name(name)) {
         return ERROR_INVALID_NAME;
@@ -282,12 +245,7 @@ int polynomial_exists(char name) {
     return (ret == ERROR_SUCCESS) ? 1 : 0;
 }
 
-/**
- * @brief Get polynomial term count
- * @param name polynomial name
- * @param count term count
- * @return 0: success, other: error code
- */
+// 获取多项式项数
 int get_polynomial_term_count(char name, int* count) {
     if (!is_valid_polynomial_name(name)) {
         return ERROR_INVALID_NAME;
@@ -301,11 +259,9 @@ int get_polynomial_term_count(char name, int* count) {
     int ret = PolynomialManager::get_polynomial_string(name, result);
 
     if (ret == ERROR_SUCCESS) {
-        // Parse term count from standard format string
         if (result == "0") {
             *count = 0;
         } else {
-            // Find first comma to get term count
             size_t first_comma = result.find(',');
             if (first_comma != string::npos) {
                 string count_str = result.substr(0, first_comma);
@@ -319,35 +275,31 @@ int get_polynomial_term_count(char name, int* count) {
     return ret;
 }
 
-/**
- * @brief Get error description
- * @param error_code error code
- * @return error description string
- */
+// 错误信息
 const char* get_polynomial_error_description(int error_code) {
     switch (error_code) {
         case ERROR_SUCCESS:
             return "Success";
         case ERROR_INVALID_NAME:
-            return "Invalid polynomial name (must be 'a'-'e')";
+            return "多项式名称错误(must be 'a'-'e')";
         case ERROR_POLYNOMIAL_NOT_FOUND:
-            return "Polynomial not found";
+            return "多项式不存在";
         case ERROR_INVALID_INPUT:
-            return "Invalid input";
+            return "非法输入";
         case ERROR_TOO_MANY_POLYNOMIALS:
-            return "Too many polynomials (maximum 5)";
+            return "数量超过上限 (maximum 5)";
         case ERROR_EMPTY_EXPRESSION:
-            return "Empty expression";
+            return "多项式为空";
         case ERROR_EXPRESSION_PARSE_ERROR:
-            return "Expression parse error";
+            return "多项式解析错误";
         case ERROR_INVALID_EXPRESSION:
-            return "Invalid expression";
+            return "非法表达式";
         case ERROR_PARENTHESES_MISMATCH:
-            return "Parentheses mismatch";
+            return "括号不匹配";
         case ERROR_INVALID_CHARACTER:
-            return "Invalid character in expression";
+            return "非法字符";
         default:
-            return "Unknown error";
+            return "未知错误";
     }
 }
 
