@@ -197,7 +197,47 @@ extern "C" {
             return -6;  // 没有结果
         }
         output_info();
-        return stack_num->pop();   
+        return stack_num->pop();
+    }
+
+    // 获取数字栈操作数量
+    int get_num_operations_count() {
+        return stack_num_op_cnt;
+    }
+
+    // 获取符号栈操作数量
+    int get_sym_operations_count() {
+        return stack_sym_op_cnt;
+    }
+
+    // 获取指定索引的数字栈操作
+    // 通过指针参数返回: (操作类型, 数值, 时间戳)
+    void get_num_operation_at(int index, int* op_type, int* value, int* timestamp) {
+        if (index >= 0 && index < stack_num_op_cnt) {
+            auto operation = stack_num_operation[index];
+            *op_type = operation.first.first;
+            *value = operation.first.second;
+            *timestamp = operation.second;
+        } else {
+            *op_type = 0;
+            *value = 0;
+            *timestamp = 0;
+        }
+    }
+
+    // 获取指定索引的符号栈操作
+    // 通过指针参数返回: (操作类型, 符号, 时间戳)
+    void get_sym_operation_at(int index, int* op_type, int* symbol, int* timestamp) {
+        if (index >= 0 && index < stack_sym_op_cnt) {
+            auto operation = stack_sym_operation[index];
+            *op_type = operation.first.first;
+            *symbol = operation.first.second;
+            *timestamp = operation.second;
+        } else {
+            *op_type = 0;
+            *symbol = 0;
+            *timestamp = 0;
+        }
     }
 
 }

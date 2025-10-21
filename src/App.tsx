@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
+import StackAnimation from "./StackAnimation";
 import "./App.css";
 
 function App() {
@@ -8,6 +9,8 @@ function App() {
   const [result, setResult] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [initStatus, setInitStatus] = useState("");
+  const [operations, setOperations] = useState<any[]>([]);
+  const [showAnimation, setShowAnimation] = useState(false);
 
   // 应用启动时初始化栈
   useEffect(() => {
@@ -33,10 +36,23 @@ function App() {
       setError("");
       const calcResult = await invoke("calculate_expression", { expression });
       setResult(calcResult as number);
+
+      // 计算完成后获取操作历史用于动画
+      await loadOperations();
     } catch (err) {
       console.error("Error calculating expression:", err);
-      setError(err + " Please check your input.");
+      setError(err as string);
       setResult(null);
+    }
+  }
+
+  async function loadOperations() {
+    try {
+      const ops = await invoke("get_animation_operations");
+      setOperations(ops as any[]);
+      setShowAnimation(true);
+    } catch (err) {
+      console.error("Error loading operations:", err);
     }
   }
 
@@ -48,31 +64,14 @@ function App() {
 
   return (
     <main className="container">
-      <h1>C++ Stack Calculator</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-
-      {/* 初始化状态显示 */}
-      <div className="row" style={{ margin: "20px 0", padding: "15px", backgroundColor: "#e8f5e8", borderRadius: "8px" }}>
-        <h2>C++ Backend Status</h2>
-        <p><strong>Stack Status:</strong> {initStatus}</p>
-      </div>
+      <h1>Tauri&C++ Stack Calculator</h1>
 
       {/* 计算器界面 */}
       <div className="calculator" style={{ margin: "20px 0", padding: "20px", backgroundColor: "#f8f9fa", borderRadius: "8px", border: "1px solid #dee2e6" }}>
-        <h2>Expression Calculator</h2>
+        <h2>表达式计算器</h2>
         <p style={{ marginBottom: "15px", color: "#6c757d" }}>
-          Enter mathematical expressions using +, -, *, / and parentheses
+          输入表达式，包括:+,-,*,/,^,(,),|. 注意，绝对值计算符号'|'不支持嵌套 
+          注意，绝对值计算符号'|'不支持嵌套
         </p>
 
         <div className="input-group" style={{ marginBottom: "15px" }}>
@@ -106,7 +105,7 @@ function App() {
             marginRight: "10px"
           }}
         >
-          Calculate
+          计算
         </button>
 
         <button
@@ -125,7 +124,7 @@ function App() {
             cursor: "pointer"
           }}
         >
-          Clear
+          清空
         </button>
 
         {/* 结果显示 */}
@@ -134,6 +133,47 @@ function App() {
             <h3 style={{ margin: "0 0 10px 0", color: "#155724" }}>Result</h3>
             <p style={{ fontSize: "24px", fontWeight: "bold", margin: 0 }}>{result}</p>
           </div>
+        )}
+
+        {/* 栈操作动画 */}
+        {showAnimation && operations.length > 0 && (
+          <>
+            <button
+              onClick={() => setShowAnimation(false)}
+              style={{
+                padding: "8px 16px",
+                fontSize: "14px",
+                backgroundColor: "#dc3545",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                marginTop: "10px"
+              }}
+            >
+              隐藏动画
+            </button>
+            <StackAnimation operations={operations} />
+          </>
+        )}
+
+        {/* 显示动画按钮 */}
+        {!showAnimation && operations.length > 0 && (
+          <button
+            onClick={() => setShowAnimation(true)}
+            style={{
+              padding: "10px 20px",
+              fontSize: "16px",
+              backgroundColor: "#28a745",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              marginTop: "20px"
+            }}
+          >
+            显示栈操作动画
+          </button>
         )}
 
         {/* 错误显示 */}
@@ -146,7 +186,7 @@ function App() {
 
         {/* 示例表达式 */}
         <div style={{ marginTop: "20px", padding: "15px", backgroundColor: "#e2e3e5", borderRadius: "4px" }}>
-          <h4 style={{ margin: "0 0 10px 0" }}>Example Expressions:</h4>
+          <h4 style={{ margin: "0 0 10px 0" }}>示例表达式:</h4>
           <ul style={{ margin: 0, paddingLeft: "20px" }}>
             <li>3+4*2 = 11</li>
             <li>(3+4)*2 = 14</li>
