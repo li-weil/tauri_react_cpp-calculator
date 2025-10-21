@@ -29,8 +29,9 @@ fn calculation_safe(expression: &str) -> Result<i32, String> {
             -2 => Err("Empty input".to_string()),
             -3 => Err("Division by zero".to_string()),
             -4 => Err("Unknown operator".to_string()),
-            -5 => Err("Invalid expression - not enough numbers".to_string()),
+            -5 => Err("Invalid expression".to_string()),
             -6 => Err("No result available".to_string()),
+            -7 => Err("Invalid expression - mismatched parentheses".to_string()),
             _ => Ok(result)
         }
     }
