@@ -230,6 +230,8 @@ int calculation(const char* input) {
 
     reset_calculation_state();
 
+    if (expres)
+
     // 处理表达式
     for (size_t i = 0; i < expression.length(); i++) {
         char current_char = expression[i];
